@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models/product.dart';
+import '../logic/product_list/Add.dart';
+import '../components/product_form.dart';
 
 class AddProductScreen extends StatefulWidget {
   @override
@@ -28,21 +29,18 @@ class _AddProductScreenState extends State<AddProductScreen> {
       await Future.delayed(const Duration(seconds: 2));
 
       final price = double.tryParse(_priceController.text);
-      
+
       if (price == null || price <= 0) {
         throw Exception("Harga produk tidak valid");
       }
 
-      final newProduct = Product(
+      AddProductLogic.addProduct(
         name: _nameController.text,
         price: price,
         description: _descController.text,
         category: _categoryController.text,
-        imageUrl: "https://picsum.photos/202",
       );
 
-      globalProducts.add(newProduct);
-      
       if (mounted) {
         Navigator.pop(context);
       }
@@ -67,66 +65,19 @@ class _AddProductScreenState extends State<AddProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Add Product")),
+      appBar: AppBar(
+        title: const Text("Add Product"),
+      ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(labelText: "Nama Produk"),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Nama produk harus diisi';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _priceController,
-                decoration: InputDecoration(labelText: "Harga"),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Harga harus diisi';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Harga harus berupa angka';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _descController,
-                decoration: InputDecoration(labelText: "Deskripsi"),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Deskripsi harus diisi';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _categoryController,
-                decoration: InputDecoration(labelText: "Kategori"),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Kategori harus diisi';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              _isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : ElevatedButton(
-                      onPressed: _saveProduct,
-                      child: Text("Simpan Produk"),
-                    )
-            ],
-          ),
+        padding: const EdgeInsets.all(16.0),
+        child: ProductForm(
+          formKey: _formKey,
+          nameController: _nameController,
+          priceController: _priceController,
+          descController: _descController,
+          categoryController: _categoryController,
+          isLoading: _isLoading,
+          onSubmit: _saveProduct,
         ),
       ),
     );
