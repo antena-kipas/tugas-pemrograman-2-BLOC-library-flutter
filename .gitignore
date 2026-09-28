@@ -1,86 +1,78 @@
-
-# FVM Version Cache
-.fvm/
 # Miscellaneous
 *.class
 *.log
 *.pyc
 *.swp
+*.swo
 .DS_Store
 .atom/
 .buildlog/
 .history
 .svn/
-.idea/
-.vscode/
+Thumbs.db
+
+# IntelliJ / Android Studio
 *.iml
-*.ipr
-*.iws
+.idea/
+.idea_modules/
 
-# IntelliJ
-out/
+# Visual Studio Code / VSCodium
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
-# Flutter/Dart/Pub related
+# Flutter/Dart/Pub
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
 /build/
+lib/generated_plugin_registrant.dart
 
-# Symbolication related
-app.*.symbols
+# Android
+/android/app/src/main/res/raw/
+/android/local.properties
+/android/key.properties
+/android/**/GeneratedPluginRegistrant.java
+*.jks
+*.keystore
 
-# Obfuscation related
-app.*.map.json
+# iOS
+/ios/Flutter/.last_build_id
+/ios/Flutter/App.framework
+/ios/Flutter/Flutter.framework
+/ios/Flutter/Flutter.podspec
+/ios/Flutter/Generated.xcconfig
+/ios/Flutter/app.flx
+/ios/Flutter/app.zip
+/ios/Flutter/flutter_assets/
+/ios/Flutter/flutter_export_environment.sh
+/ios/Pods/
+/ios/Runner.xcworkspace/xcuserdata/
+/ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+/ios/Runner/GeneratedPluginRegistrant.h
+/ios/Runner/GeneratedPluginRegistrant.m
 
-# Android related
-**/android/**/gradle-wrapper.jar
-**/android/.gradle
-**/android/captures/
-**/android/gradlew
-**/android/gradlew.bat
-**/android/local.properties
-**/android/**/GeneratedPluginRegistrant.java
+# macOS
+/macos/Flutter/GeneratedPluginRegistrant.swift
+/macos/Flutter/ephemeral/
+/macos/Pods/
+/macos/Runner.xcworkspace/xcuserdata/
 
-# iOS/XCode related
-**/ios/**/*.mode1v3
-**/ios/**/*.mode2v3
-**/ios/**/*.moved-aside
-**/ios/**/*.pbxuser
-**/ios/**/*.perspectivev3
-**/ios/**/*sync/
-**/ios/**/.mac/
-**/ios/**/.DS_Store
-**/ios/.generated/
-**/ios/Flutter/App.framework
-**/ios/Flutter/Flutter.framework
-**/ios/Flutter/Flutter.podspec
-**/ios/Flutter/Generated.xcconfig
-**/ios/Flutter/app.flx
-**/ios/Flutter/app.zip
-**/ios/Flutter/flutter_assets/
-**/ios/Flutter/flutter_export_environment.sh
-**/ios/ServiceDefinitions.json
-**/ios/Runner/GeneratedPluginRegistrant.*
+# Linux / Windows
+/linux/flutter/ephemeral/
+/windows/flutter/ephemeral/
 
-# macOS related
-**/macos/Flutter/GeneratedPluginRegistrant.swift
-**/macos/Flutter/ephemeral/
+# Web
+/web/flutter_bootstrap.js
 
-# Windows related
-**/windows/flutter/ephemeral/
-**/windows/flutter/ephemeral/generated_config.cmake
+# FVM (Flutter Version Management)
+.fvm/flutter_sdk
 
-# Linux related
-**/linux/flutter/ephemeral/
-**/linux/flutter/ephemeral/generated_config.cmake
-
-# Web related
-.dart_tool/dartpad/
-web/built_*.dart.js
-web/built_*.dart.js.map
-web/built_*.dart.js.deps
-
-# Exceptions to above rules.
-!**/ios/**/default.pbxuser
+# Environment Variables / Secrets
+.env
+.env.production
+.env.staging
