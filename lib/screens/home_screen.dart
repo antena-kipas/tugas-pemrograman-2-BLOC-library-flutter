@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tugas/screens/login_screen.dart';
 import '../models/product.dart';
 import '../services/api_service.dart';
 import 'product_detail.dart';
@@ -77,6 +78,18 @@ class _HomeScreenState extends State<HomeScreen> {
               )
             : const Text("Product Catalog"),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await ApiService().logout();
+              if (mounted) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                );
+              }
+            },
+          ),
           IconButton(
             icon: Icon(
               _isSearching ? Icons.close : Icons.search,

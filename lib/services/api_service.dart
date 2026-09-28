@@ -40,6 +40,13 @@ class ApiService {
       '/items/products/$id',
     );
   }
+  Future<void> logout() async {
+    try {
+      await dio.post('/auth/logout');
+    } catch (e) {
+      // Handle error if needed
+    }
+  }
 
   Future<String> uploadImage(String filePath) async {
     final formData = FormData.fromMap({
