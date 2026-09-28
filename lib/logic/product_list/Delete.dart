@@ -1,13 +1,13 @@
 import '../../models/product.dart';
+import '../../services/api_service.dart';
 
 class DeleteProductLogic {
-  static void deleteProduct(Product product) {
-    final index = globalProducts.indexOf(product);
-
-    if (index == -1) {
-      throw Exception("Produk tidak ditemukan");
+  static Future<void> deleteProduct(Product product) async {
+    if (product.id == null) {
+      throw Exception("ID Produk tidak ditemukan");
     }
 
-    globalProducts.removeAt(index);
+    final apiService = ApiService();
+    await apiService.deleteProduct(product.id!);
   }
 }

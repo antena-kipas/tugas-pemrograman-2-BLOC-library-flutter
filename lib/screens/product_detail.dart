@@ -4,7 +4,6 @@ import 'edit_product.dart';
 import '../components/confirm_delete.dart';
 import '../logic/product_list/Delete.dart';
 
-
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
 
@@ -19,23 +18,36 @@ class ProductDetailScreen extends StatefulWidget {
   }
 }
 
-
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   late Product _product;
 
   void _showDeleteConfirmation() {
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return ConfirmDelete(
           onCancel: () {
-            Navigator.pop(context);
+            Navigator.pop(dialogContext);
           },
-          onConfirm: () {
-            DeleteProductLogic.deleteProduct(_product);
-
-            Navigator.pop(context); // tutup dialog
-            Navigator.pop(context); // kembali ke Home
+          onConfirm: () async {
+            Navigator.pop(dialogContext);
+            
+            try {
+              await DeleteProductLogic.deleteProduct(_product);
+              
+              if (mounted) {
+                Navigator.pop(context);
+              }
+            } catch (e) {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(e.toString().replaceAll("Exception: ", "")),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            }
           },
         );
       },
@@ -45,31 +57,40 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   void initState() {
     super.initState();
-
     _product = widget.product;
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(_product.name)),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
-              child: Image.network(_product.imageUrl, height: 200, fit: BoxFit.cover),
+              child: _product.imageUrl != null
+                ? Image.network(
+                    'https://pos.cicd.web.id/assets/${_product.imageUrl}',
+                    height: 200,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(Icons.broken_image, size: 200, color: Colors.grey);
+                    },
+                  )
+                : const Icon(Icons.image, size: 200),
             ),
-            SizedBox(height: 16),
-            Text(_product.name, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            SizedBox(height: 8),
+            const SizedBox(height: 16),
+            Text(_product.name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
             Text("Rp ${_product.price.toStringAsFixed(0)}", 
-                style: TextStyle(fontSize: 20, color: Colors.green)),
-            SizedBox(height: 16),
-            Text("Deskripsi:", style: TextStyle(fontWeight: FontWeight.bold)),
-            SizedBox(height: 8),
-            Text(_product.description),
-            Spacer(),
+                style: const TextStyle(fontSize: 20, color: Colors.green)),
+            const SizedBox(height: 16),
+            const Text("Deskripsi:", style: const TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text(_product.description ?? 'Tidak ada deskripsi'),
+            const Spacer(),
             Row(
               children: [
                 Expanded(
@@ -93,9 +114,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     child: const Text("Edit"),
                   ),
                 ),
-
                 const SizedBox(width: 10),
-
                 Expanded(
                   child: ElevatedButton(
                     onPressed: _showDeleteConfirmation,

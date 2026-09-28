@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/product.dart';
 import '../components/product_form.dart';
 import '../logic/product_list/Edit.dart';
@@ -23,6 +24,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
   late final TextEditingController _descController;
   late final TextEditingController _categoryController;
 
+  final ImagePicker _picker = ImagePicker();
+  String? _selectedImagePath;
+
   bool _isLoading = false;
 
   @override
@@ -46,6 +50,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
     );
   }
 
+  Future<void> _pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _selectedImagePath = image.path;
+      });
+    }
+  }
+
   Future<void> _updateProduct() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -56,15 +69,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
     });
 
     try {
-      await Future.delayed(const Duration(seconds: 2));
-
       final price = double.tryParse(_priceController.text);
 
       if (price == null || price <= 0) {
         throw Exception("Harga produk tidak valid");
       }
 
-      final updatedProduct = EditProductLogic.editProduct(
+      final updatedProduct = await EditProductLogic.editProduct(
             oldProduct: widget.product,
             name: _nameController.text,
             price: price,
@@ -119,6 +130,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
           priceController: _priceController,
           descController: _descController,
           categoryController: _categoryController,
+          selectedImagePath: _selectedImagePath,
+          onPickImage: _pickImage,
           isLoading: _isLoading,
           onSubmit: _updateProduct,
         ),

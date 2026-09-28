@@ -1,12 +1,12 @@
 import '../../models/product.dart';
 
 class SearchProductLogic {
-  static List<Product> searchProduct(String keyword) {
+  static List<Product> searchProduct(List<Product> products, String keyword) {
     if (keyword.isEmpty) {
-      return globalProducts;
+      return products;
     }
 
-    return globalProducts
+    return products
         .where(
           (product) => product.name
               .toLowerCase()

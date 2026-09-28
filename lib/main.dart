@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/home_screen.dart';
+import 'screens/login_screen.dart'; 
 
 void main() {
   runApp(MyApp());
@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Product Catalog',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: HomeScreen(),
+      home: const LoginScreen(), 
       debugShowCheckedModeBanner: false,
     );
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../logic/product_list/Add.dart';
 import '../components/product_form.dart';
+import '../services/api_service.dart';
 
 class AddProductScreen extends StatefulWidget {
   @override
@@ -14,10 +16,31 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final _descController = TextEditingController();
   final _categoryController = TextEditingController();
   
+  final ImagePicker _picker = ImagePicker();
+  String? _selectedImagePath;
   bool _isLoading = false;
+
+  Future<void> _pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _selectedImagePath = image.path;
+      });
+    }
+  }
 
   Future<void> _saveProduct() async {
     if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (_selectedImagePath == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Pilih gambar terlebih dahulu"),
+          backgroundColor: Colors.red,
+        ),
+      );
       return;
     }
 
@@ -26,19 +49,21 @@ class _AddProductScreenState extends State<AddProductScreen> {
     });
 
     try {
-      await Future.delayed(const Duration(seconds: 2));
-
       final price = double.tryParse(_priceController.text);
 
       if (price == null || price <= 0) {
         throw Exception("Harga produk tidak valid");
       }
 
-      AddProductLogic.addProduct(
+      final apiService = ApiService();
+      final String imageUuid = await apiService.uploadImage(_selectedImagePath!);
+
+      await AddProductLogic.addProduct(
         name: _nameController.text,
         price: price,
         description: _descController.text,
         category: _categoryController.text,
+        imageUrl: imageUuid,
       );
 
       if (mounted) {
@@ -63,6 +88,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   @override
+  void dispose() {
+    _nameController.dispose();
+    _priceController.dispose();
+    _descController.dispose();
+    _categoryController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -76,6 +110,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
           priceController: _priceController,
           descController: _descController,
           categoryController: _categoryController,
+          selectedImagePath: _selectedImagePath,
+          onPickImage: _pickImage,
           isLoading: _isLoading,
           onSubmit: _saveProduct,
         ),

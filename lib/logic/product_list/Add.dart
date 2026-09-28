@@ -1,20 +1,23 @@
-import '../../models/product.dart';
+import '../../services/api_service.dart';
 
 class AddProductLogic {
-  static void addProduct({
+  static Future<void> addProduct({
     required String name,
     required double price,
     required String description,
     required String category,
-  }) {
-    final newProduct = Product(
-      name: name,
-      price: price,
-      description: description,
-      category: category,
-      imageUrl: "https://picsum.photos/202",
-    );
+    required String imageUrl,
+  }) async {
+    final apiService = ApiService();
+    
+    final Map<String, dynamic> productData = {
+      'name': name,
+      'price': price.toInt(),
+      'description': description,
+      'category': category,
+      'image_url': imageUrl,
+    };
 
-    globalProducts.add(newProduct);
+    await apiService.addProduct(productData);
   }
 }
