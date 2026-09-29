@@ -29,3 +29,4 @@ class ProductFormFailure extends ProductFormState {
   @override
   List<Object?> get props => [message];
 }
+
