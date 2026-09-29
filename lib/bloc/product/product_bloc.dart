@@ -10,6 +10,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   ProductBloc({required this.apiService}) : super(ProductInitial()) {
     on<FetchProducts>(_onFetchProducts);
     on<SearchProducts>(_onSearchProducts);
+    on<DeleteProduct>(_onDeleteProduct);
   }
 
   Future<void> _onFetchProducts(FetchProducts event, Emitter<ProductState> emit) async {
