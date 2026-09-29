@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import '../logic/product_list/Add.dart';
+import '../bloc/product_form/product_form_bloc.dart';
+import '../bloc/product_form/product_form_event.dart';
+import '../bloc/product_form/product_form_state.dart';
 import '../components/product_form.dart';
-import '../services/api_service.dart';
 
 class AddProductScreen extends StatefulWidget {
   @override
@@ -15,10 +17,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final _priceController = TextEditingController();
   final _descController = TextEditingController();
   final _categoryController = TextEditingController();
-  
   final ImagePicker _picker = ImagePicker();
   String? _selectedImagePath;
-  bool _isLoading = false;
 
   Future<void> _pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -29,11 +29,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
     }
   }
 
-  Future<void> _saveProduct() async {
+  void _saveProduct() {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-
+    
     if (_selectedImagePath == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -44,47 +44,27 @@ class _AddProductScreenState extends State<AddProductScreen> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    final price = double.tryParse(_priceController.text);
+    if (price == null || price <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Harga produk tidak valid"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
-    try {
-      final price = double.tryParse(_priceController.text);
-
-      if (price == null || price <= 0) {
-        throw Exception("Harga produk tidak valid");
-      }
-
-      final apiService = ApiService();
-      final String imageUuid = await apiService.uploadImage(_selectedImagePath!);
-
-      await AddProductLogic.addProduct(
+    // Trigger event BLoC
+    context.read<ProductFormBloc>().add(
+      SubmitAddProduct(
         name: _nameController.text,
         price: price,
         description: _descController.text,
         category: _categoryController.text,
-        imageUrl: imageUuid,
-      );
-
-      if (mounted) {
-        Navigator.pop(context);
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString().replaceAll("Exception: ", "")),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
+        imagePath: _selectedImagePath!,
+      ),
+    );
   }
 
   @override
@@ -102,18 +82,36 @@ class _AddProductScreenState extends State<AddProductScreen> {
       appBar: AppBar(
         title: const Text("Add Product"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ProductForm(
-          formKey: _formKey,
-          nameController: _nameController,
-          priceController: _priceController,
-          descController: _descController,
-          categoryController: _categoryController,
-          selectedImagePath: _selectedImagePath,
-          onPickImage: _pickImage,
-          isLoading: _isLoading,
-          onSubmit: _saveProduct,
+      body: BlocListener<ProductFormBloc, ProductFormState>(
+        listener: (context, state) {
+          if (state is ProductFormSuccess) {
+            Navigator.pop(context);
+          } else if (state is ProductFormFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: BlocBuilder<ProductFormBloc, ProductFormState>(
+            builder: (context, state) {
+              return ProductForm(
+                formKey: _formKey,
+                nameController: _nameController,
+                priceController: _priceController,
+                descController: _descController,
+                categoryController: _categoryController,
+                selectedImagePath: _selectedImagePath,
+                onPickImage: _pickImage,
+                isLoading: state is ProductFormLoading, // Update indikator loading dari BLoC
+                onSubmit: _saveProduct,
+              );
+            },
+          ),
         ),
       ),
     );
